@@ -15,7 +15,7 @@ Controllable Time-delay Transformer 模型结构如上图所示，由 Embedding�
 
 在模型的选择上采用了性能优越的Transformer模型。Transformer模型在获得良好性能的同时，由于模型自身序列化输入等特性，会给系统带来较大时延。常规的Transformer可以看到未来的全部信息，导致标点会依赖很远的未来信息。这会给用户带来一种标点一直在变化刷新，长时间结果不固定的不良感受。基于这一问题，我们创新性的提出了可控时延的Transformer模型（Controllable Time-Delay Transformer, CT-Transformer），在模型性能无损失的情况下，有效控制标点的延时。
 
-##### ASR常用参数（参考：asr.yaml文件）：
+##### Punc常用参数（参考：punc.yaml文件）：
 用于解码的punc.yaml配置参数，取自官方模型配置config.yaml原文件。
 
 ## 模型调用方法：
