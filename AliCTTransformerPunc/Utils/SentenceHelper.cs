@@ -67,7 +67,7 @@ namespace AliCTTransformerPunc.Utils
             {
                 string[] sentences;
                 int length = words.Length;
-                int sentenceLen = length / wordLimit;
+                int sentenceLen = (int)Math.Floor((double)(length / wordLimit));
                 for (int i = 0; i < sentenceLen; i++)
                 {
                     T[] vs = new T[wordLimit];
@@ -77,7 +77,7 @@ namespace AliCTTransformerPunc.Utils
                 int tailLength = length % wordLimit;
                 if (tailLength > 0)
                 {
-                    T[] vs = new T[wordLimit];
+                    T[] vs = new T[tailLength];
                     Array.Copy(words, sentenceLen * wordLimit, vs, 0, tailLength);
                     wordsList.Add(vs);
                 }
