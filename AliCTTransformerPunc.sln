@@ -10,7 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{8B0B7219-F91B-4EB9-A3C5-0373D8D9F56A}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		README.zh_CN.md = README.zh_CN.md
+		readme\README.zh_CN.md = readme\README.zh_CN.md
 	EndProjectSection
 EndProject
 Global
