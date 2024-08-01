@@ -1,3 +1,5 @@
+（[简体中文](readme/README.zh_CN.md) |  English）
+
 # AliCTTransformerPunc
 #### Introduction:
 
