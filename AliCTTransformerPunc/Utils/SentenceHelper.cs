@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AliCTTransformerPunc.Utils
+﻿namespace AliCTTransformerPunc.Utils
 {
     /// <summary>
     /// SentenceHelper
@@ -40,18 +34,21 @@ namespace AliCTTransformerPunc.Utils
                 }
                 if (current_word.Length > 0)
                 {
-                    words.Append(current_word);
+                    words.Add(current_word + "▁");
                 }
             }
             return words.ToArray();
         }
 
-        public static int[] Tokens2ids(string[] _tokens, string[] splitText)
+        public static int[] Tokens2ids(string[]? _tokens, string[]? splitText)
         {
             int[] ids = new int[splitText.Length];
-            for (int i = 0; i < splitText.Length; i++)
+            if (_tokens != null && splitText != null)
             {
-                ids[i] = Array.IndexOf(_tokens, splitText[i]);
+                for (int i = 0; i < splitText.Length; i++)
+                {
+                    ids[i] = Array.IndexOf(_tokens, splitText[i].Trim('▁'));
+                }
             }
             return ids;
         }

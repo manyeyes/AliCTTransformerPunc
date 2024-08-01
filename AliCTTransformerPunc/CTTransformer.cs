@@ -1,16 +1,12 @@
 ﻿// See https://github.com/manyeyes for more information
 // Copyright (c)  2023 by manyeyes
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AliCTTransformerPunc.Model;
 using AliCTTransformerPunc.Utils;
-using Microsoft.ML;
+using Microsoft.Extensions.Logging;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
-using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Text;
 
 namespace AliCTTransformerPunc
 {
@@ -18,15 +14,16 @@ namespace AliCTTransformerPunc
     /// CTTransformer
     /// Copyright (c)  2023 by manyeyes
     /// </summary>
-    public class CTTransformer
+    public class CTTransformer : IDisposable
     {
+        // To detect redundant calls
+        private bool _disposed;
+
         private InferenceSession _onnxSession;
         private readonly ILogger<CTTransformer> _logger;
-        private string[] _punc_list;
-        private ModelConfEntity _modelConfEntity;
-        private PunctuationConfEntity _punctuationConfEntity;
-        private string[] _tokens;
-        private int _batchSize = 1;
+        private string[]? _punc_list;
+        private string[]? _punc_en_list;
+        private string[]? _tokens;
         private int _period = 0;
 
         public CTTransformer(string modelFilePath, string configFilePath, string tokensFilePath, int batchSize = 1, int threadsNum = 1)
@@ -42,20 +39,20 @@ namespace AliCTTransformerPunc
             _tokens = File.ReadAllLines(tokensFilePath);
             PuncYamlEntity puncYamlEntity = YamlHelper.ReadYaml<PuncYamlEntity>(configFilePath);
             _punc_list = puncYamlEntity.punc_list;
-            _modelConfEntity = puncYamlEntity.model_conf;
-            _punctuationConfEntity = puncYamlEntity.punctuation_conf;
-            _batchSize = batchSize;
+            _punc_en_list = new string[_punc_list.Length];
+            Array.Copy(_punc_list, _punc_en_list, _punc_list.Length);
+            _punc_en_list = _punc_en_list.Select(x => x.Replace("，", ",").Replace("？", "?").Replace("。", ".")).ToArray();
+            for (int i = 0; i < _punc_en_list.Length; i++)
+            {
+                if (_punc_en_list[i] == ".")
+                {
+                    _period = i;
+                }
+            }
+            _punc_list = _punc_list.Select(x => x.Replace(",", "，").Replace("?", "？").Replace(".", "。")).ToArray();
             for (int i = 0; i < _punc_list.Length; i++)
             {
-                if (_punc_list[i] == ",")
-                {
-                    _punc_list[i] = "，";
-                }
-                else if (_punc_list[i] == "?")
-                {
-                    _punc_list[i] = "？";
-                }
-                else if (_punc_list[i] == "。")
+                if (_punc_list[i] == "。")
                 {
                     _period = i;
                 }
@@ -64,7 +61,7 @@ namespace AliCTTransformerPunc
             _logger = new Logger<CTTransformer>(loggerFactory);
         }
 
-        public string GetResults(string text, int splitSize = 20)
+        public string GetResults(string text, int splitSize = 10)
         {
             string[] splitText = Utils.SentenceHelper.CodeMixSplitWords(text);
             int[] split_text_id = Utils.SentenceHelper.Tokens2ids(_tokens, splitText);
@@ -127,11 +124,12 @@ namespace AliCTTransformerPunc
                         int[] temp_punctuations = new int[sentenceEnd + 1];
                         Array.Copy(punctuations, 0, temp_punctuations, 0, temp_punctuations.Length);
                         new_mini_sentences_id.Add(temp_punctuations);
+                        Array.Clear(punctuations, 0, temp_punctuations.Length);
                     }
                 }
                 if (j == mini_sentences_id.Count - 1)
                 {
-                    if (_punc_list[punctuations.Last()] == "," || _punc_list[punctuations.Last()] == "、")
+                    if (_punc_list[punctuations.Last()] == "，" || _punc_list[punctuations.Last()] == "、")
                     {
                         punctuations[punctuations.Length - 1] = _period;
                     }
@@ -140,7 +138,7 @@ namespace AliCTTransformerPunc
                         punctuations[punctuations.Length - 1] = _period;
                         int[] temp_punctuations = new int[punctuations.Length + 1];
                         Array.Copy(punctuations, 0, temp_punctuations, 0, punctuations.Length);
-                        temp_punctuations.LastOrDefault(_period);
+                        temp_punctuations[punctuations.Length - 1] = _period;
                         punctuations = temp_punctuations;
                     }
                     new_mini_sentences_id.Add(punctuations);
@@ -162,17 +160,32 @@ namespace AliCTTransformerPunc
                 {
                     if (m < splitText.Length)
                     {
-                        sb.Append(splitText[m]);
+                        string word = splitText[m];
+                        sb.Append(word);
                         m++;
-                    }
-                    if (id > 1)
-                    {
-                        sb.Append(_punc_list[id]);
-                    }
+                        if (id > 1)
+                        {
+                            if (word.Length > 1)
+                            {
+                                sb.Append(_punc_en_list[id] + " ");
+                            }
+                            else
+                            {
+                                if (word.Length > 0 && word[0] > sbyte.MaxValue)
+                                {
+                                    sb.Append(_punc_list[id]);
+                                }
+                                else
+                                {
+                                    sb.Append(_punc_en_list[id] + " ");
+                                }
+                            }
 
+                        }
+                    }
                 }
             }
-            return sb.ToString();
+            return sb.ToString().Replace("▁", " ");
         }
 
         private PuncOutputEntity Forward(PuncInputEntity modelInput)
@@ -238,7 +251,41 @@ namespace AliCTTransformerPunc
             }
             return modelOutput;
         }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_onnxSession != null)
+                    {
+                        _onnxSession?.Dispose();
+                    }
+                    if (_punc_list != null)
+                    {
+                        _punc_list = null;
+                    }
+                    if (_punc_en_list != null)
+                    {
+                        _punc_en_list = null;
+                    }
+                    if (_tokens != null)
+                    {
+                        _tokens = null;
+                    }
+                }
+                _disposed = true;
+            }
+        }
 
-
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        ~CTTransformer()
+        {
+            Dispose(_disposed);
+        }
     }
 }
