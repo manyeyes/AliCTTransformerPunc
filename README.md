@@ -3,7 +3,7 @@
 # AliCTTransformerPunc
 #### Introduction:
 
-**AliCTTransformerPunc is a "text punctuation prediction" library written in C#, which uses Microsoft.ML.OnnxRuntime to decode the ONNX model at the bottom layer, supports framework .Net6.0+, supports cross-platform compilation, and supports AOT compilation. It is simple and convenient to use.**
+AliCTTransformerPunc is a "text punctuation prediction" library written in C#. Under the hood, it utilizes Microsoft.ML.OnnxRuntime to decode ONNX models. This library boasts excellent compatibility in terms of framework adaptation, supporting multiple environments such as net461+, net60+, netcoreapp3.1, and netstandard2.0+. It supports cross-platform compilation as well as AOT compilation, and is simple and convenient to use.
 
 #### Supported Models (ONNX)
 | Model Name | Vocabulary Size | Supported Languages | Download Link |
