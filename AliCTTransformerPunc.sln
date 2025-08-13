@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AliCTTransformerPunc.Exampl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{8B0B7219-F91B-4EB9-A3C5-0373D8D9F56A}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
 		README.md = README.md
 		readme\README.zh_CN.md = readme\README.zh_CN.md
 	EndProjectSection

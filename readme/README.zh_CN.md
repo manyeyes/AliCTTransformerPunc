@@ -1,9 +1,7 @@
-（简体中文|  [English](README.md)）
-
 # AliCTTransformerPunc
 ##### 简介：
 
-**AliCTTransformerPunc是一个使用C#编写的“文本标点预测”库，底层调用Microsoft.ML.OnnxRuntime对onnx模型进行解码，支持框架.Net6.0+，支持跨平台编译，支持AOT编译。使用简单方便。**
+AliCTTransformerPunc是一个使用C#编写的“文本标点预测”库，底层调用Microsoft.ML.OnnxRuntime对onnx模型进行解码。该类库在框架适配方面具有良好的兼容性，支持 net461+、net60+、netcoreapp3.1 及 netstandard2.0+ 等多种环境，支持跨平台编译，支持AOT编译。使用简单方便。
 
 ##### 支持的模型（ONNX）
 |  模型名称 |词汇量|  支持语言 | 下载地址  |
