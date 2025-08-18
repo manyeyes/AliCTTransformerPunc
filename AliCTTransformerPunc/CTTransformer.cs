@@ -28,8 +28,8 @@ namespace AliCTTransformerPunc
             PuncModel puncModel = new PuncModel(modelFilePath, threadsNum: threadsNum);
             _onnxSession = puncModel.ModelSession;
             _tokens = Utils.PreloadHelper.ReadTokens(tokensFilePath);
-            PuncYamlEntity? puncYamlEntity = Utils.PreloadHelper.ReadYaml<PuncYamlEntity>(configFilePath);
-            _punc_list = puncYamlEntity.punc_list;
+            ConfEntity? confEntity = Utils.PreloadHelper.ReadJson(configFilePath);
+            _punc_list = confEntity.punc_list;
             _punc_en_list = new string[_punc_list.Length];
             Array.Copy(_punc_list, _punc_en_list, _punc_list.Length);
             _punc_en_list = _punc_en_list.Select(x => x.Replace("，", ",").Replace("？", "?").Replace("。", ".")).ToArray();

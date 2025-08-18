@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AliCTTransformerPunc.Model
 {
-    internal class ModelConfEntity
+    public class ModelConfEntity
     {
         private int _ignore_id = 0;
 

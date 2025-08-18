@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AliCTTransformerPunc.Model
 {
-    internal class PunctuationConfEntity
+    public class PunctuationConfEntity
     {
         private string _pos_enc = "sinusoidal";
         private int _embed_unit = 256;
