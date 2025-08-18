@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AliCTTransformerPunc.Model
 {
-    internal class PuncInputEntity
+    public class PuncInputEntity
     {
         private int[] _miniSentenceId;
         private int _textLengths;

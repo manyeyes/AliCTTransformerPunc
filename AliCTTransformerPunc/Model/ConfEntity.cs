@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AliCTTransformerPunc.Model
 {
-    internal class PuncYamlEntity
+    public class ConfEntity
     {
         private int _init = int.MinValue;
         private ModelConfEntity _model_conf=new ModelConfEntity();

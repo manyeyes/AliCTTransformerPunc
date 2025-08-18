@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AliCTTransformerPunc.Model
 {
-    internal class PuncOutputEntity
+    public class PuncOutputEntity
     {
         private float[]? logits;
         private List<int[]>? _punctuations = new List<int[]>() { new int[4] };
